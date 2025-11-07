@@ -1,11 +1,14 @@
 export async function handler() {
-  const url = "https://open-api.coinglass.com/public/v2/futures";
+  const url = "https://open-api.coinglass.com/api/futures/openInterest";
   const headers = { "coinglassSecret": "54c4c521-b4fa-481d-a858-3353c1986c2d" };
 
   try {
-    const res = await fetch(`${url}/openInterest`, { headers });
+    const res = await fetch(url, { headers });
     const json = await res.json();
-    if (!json.data) throw new Error("Sem dados da API Coinglass");
+
+    if (!json.data || !Array.isArray(json.data)) {
+      throw new Error("A API Coinglass não devolveu dados válidos");
+    }
 
     const results = json.data.slice(0, 10).map(d => {
       const signal =
@@ -28,9 +31,10 @@ export async function handler() {
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
       body: JSON.stringify({ timestamp: new Date().toISOString(), results }, null, 2),
     };
+
   } catch (error) {
     return {
       statusCode: 500,
