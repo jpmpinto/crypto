@@ -1,14 +1,15 @@
 export async function handler(event, context) {
+  const proxy = "https://api.allorigins.win/raw?url=";
   const symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT", "DOGEUSDT"];
   const results = [];
 
   try {
     for (const symbol of symbols) {
       const [priceRes, fundRes, oiRes, changeRes] = await Promise.all([
-        fetch(`https://fapi.binance.com/fapi/v1/ticker/price?symbol=${symbol}`).then(r => r.json()),
-        fetch(`https://fapi.binance.com/fapi/v1/fundingRate?symbol=${symbol}&limit=1`).then(r => r.json()),
-        fetch(`https://fapi.binance.com/fapi/v1/openInterest?symbol=${symbol}`).then(r => r.json()),
-        fetch(`https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=${symbol}`).then(r => r.json())
+        fetch(`${proxy}https://fapi.binance.com/fapi/v1/ticker/price?symbol=${symbol}`).then(r => r.json()),
+        fetch(`${proxy}https://fapi.binance.com/fapi/v1/fundingRate?symbol=${symbol}&limit=1`).then(r => r.json()),
+        fetch(`${proxy}https://fapi.binance.com/fapi/v1/openInterest?symbol=${symbol}`).then(r => r.json()),
+        fetch(`${proxy}https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=${symbol}`).then(r => r.json())
       ]);
 
       const funding = parseFloat(fundRes[0]?.fundingRate || 0);
